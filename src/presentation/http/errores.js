@@ -7,6 +7,7 @@ import {
 } from '../../domain/shared/errors.js';
 import { NoEncontradoError, NoAutenticadoError, ConflictoError } from '../../application/shared/errors.js';
 import { AlmacenNoConfiguradoError } from '../../application/use-cases/archivos/FirmarSubida.js';
+import { PasarelaNoConfiguradaError, PasarelaError } from '../../application/ports/PasarelaPagos.js';
 
 /** El cuerpo, la query o los parámetros no tienen la forma esperada. */
 export class DatosInvalidosError extends Error {
@@ -28,6 +29,8 @@ const ESTADOS = [
   [NoVigenteError, 410],
   [ReglaDeNegocioError, 422],
   [AlmacenNoConfiguradoError, 503],
+  [PasarelaNoConfiguradaError, 503],
+  [PasarelaError, 502],
 ];
 
 /** Errores de Postgres que se escapan de las validaciones (carreras, etc.). */

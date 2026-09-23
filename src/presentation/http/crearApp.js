@@ -14,7 +14,7 @@ export function crearApp({ rutas, corsOrigen }) {
   app.set('trust proxy', 1);
   app.use(helmet());
   app.use(cors({ origin: corsOrigen }));
-  app.use(express.json({ limit: '100kb' }));
+  app.use(express.json({ limit: '100kb', verify: (req, _res, crudo) => (req.cuerpoCrudo = crudo) }));
 
   app.get('/', (_req, res) => ApiResponse.enviar(res, 200, { nombre: 'Corcho — tablero de deudas', version: '2.0.0' }));
   app.get('/salud', (_req, res) => ApiResponse.enviar(res, 200, { ok: true, hora: new Date().toISOString() }));

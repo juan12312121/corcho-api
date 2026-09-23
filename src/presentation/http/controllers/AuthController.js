@@ -9,4 +9,7 @@ export class AuthController extends BaseController {
   firmarFoto = this.accion('firmarSubida');
   solicitarRecuperacion = this.accion('solicitarRecuperacion', { body: esquemas.recuperar, status: 204 });
   restablecer = this.accion('restablecerPassword', { body: esquemas.restablecer });
+  // Cobrar con tarjeta (Stripe Connect)
+  estadoCobros = this.accion('estadoCobros');
+  conectarCobros = this.accion('conectarCobros');
 }

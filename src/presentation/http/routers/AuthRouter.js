@@ -14,6 +14,8 @@ export class AuthRouter extends BaseRouter {
     this.get('/yo', this.conSesion, 'perfil');
     this.patch('/yo', this.conSesion, 'editarPerfil');
     this.post('/yo/foto/firma', this.conSesion, 'firmarFoto');
+    this.get('/yo/cobros', this.conSesion, 'estadoCobros');
+    this.post('/yo/cobros', this.conSesion, 'conectarCobros');
     this.post('/recuperar', limiteAuth, 'solicitarRecuperacion');
     this.post('/restablecer', limiteAuth, 'restablecer');
   }

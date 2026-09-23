@@ -14,6 +14,10 @@ export class PgUsuarioRepository extends UsuarioRepository {
     return aEntidad(await this.modelo.buscarUno({ id }));
   }
 
+  async porCuentaStripe(cuentaId) {
+    return aEntidad(await this.modelo.buscarUno({ stripeCuentaId: cuentaId }));
+  }
+
   async porEmail(email) {
     return aEntidad(await this.modelo.fila(`SELECT ${this.modelo.select()} FROM usuarios WHERE lower(email) = lower($1)`, [email]));
   }

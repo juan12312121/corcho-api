@@ -22,6 +22,11 @@ export class PagoRepository {
     return noImplementado('PagoRepository', 'guardar');
   }
 
+  /** @returns {Promise<Pago|null>} el pago registrado para una sesión de pago con tarjeta */
+  async porSesionStripe(_sesionId) {
+    return noImplementado('PagoRepository', 'porSesionStripe');
+  }
+
   async borrar(_id) {
     return noImplementado('PagoRepository', 'borrar');
   }

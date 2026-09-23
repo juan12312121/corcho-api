@@ -8,6 +8,11 @@ export class UsuarioRepository {
   }
 
   /** Busca sin importar mayúsculas. @returns {Promise<Usuario|null>} */
+  /** @returns {Promise<Usuario|null>} dueño de una cuenta de cobro (Stripe) */
+  async porCuentaStripe(_cuentaId) {
+    return noImplementado('UsuarioRepository', 'porCuentaStripe');
+  }
+
   async porEmail(_email) {
     return noImplementado('UsuarioRepository', 'porEmail');
   }

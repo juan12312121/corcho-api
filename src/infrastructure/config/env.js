@@ -28,6 +28,11 @@ const esquema = z.object({
   N8N_CORREOS_URL: z.string().url().optional(),
   N8N_CORREOS_TOKEN: z.string().min(24).optional(),
 
+  /** Pagos con tarjeta (Stripe Connect). Sin la llave secreta, pagar con tarjeta responde 503. */
+  STRIPE_SECRET_KEY: z.string().startsWith('sk_').optional(),
+  /** Para verificar los avisos (webhook) de Stripe: whsec_… */
+  STRIPE_WEBHOOK_SECRET: z.string().optional(),
+
   /** Token que manda n8n en X-Integracion-Token para pedir los recordatorios. Sin él, la ruta está apagada. */
   INTEGRACION_TOKEN: z.string().min(24).optional(),
 });

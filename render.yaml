@@ -42,6 +42,11 @@ services:
       - key: INTEGRACION_TOKEN
         generateValue: true
       # Webhook del flujo de n8n que manda los correos, y su token (X-Correos-Token)
+      # Pagos con tarjeta (Stripe Connect): sk_test_… para probar, sk_live_… en real; whsec_… del webhook a /pasarela/stripe
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
       - key: N8N_CORREOS_URL
         sync: false
       - key: N8N_CORREOS_TOKEN

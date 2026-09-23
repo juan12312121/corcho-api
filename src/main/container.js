@@ -16,6 +16,7 @@ import { CloudinaryAlmacen } from '../infrastructure/storage/CloudinaryAlmacen.j
 import { N8nEnviadorCorreos } from '../infrastructure/mail/N8nEnviadorCorreos.js';
 import { ConsolaEnviadorCorreos } from '../infrastructure/mail/ConsolaEnviadorCorreos.js';
 import { CryptoGeneradorTokens } from '../infrastructure/security/CryptoGeneradorTokens.js';
+import { StripePasarela } from '../infrastructure/payments/StripePasarela.js';
 
 import { AccesoTablero } from '../application/services/AccesoTablero.js';
 import { Bitacora } from '../application/services/Bitacora.js';
@@ -32,6 +33,8 @@ import { IngresoController } from '../presentation/http/controllers/IngresoContr
 import { IngresoRouter } from '../presentation/http/routers/IngresoRouter.js';
 import { MetaController } from '../presentation/http/controllers/MetaController.js';
 import { MetaRouter } from '../presentation/http/routers/MetaRouter.js';
+import { PasarelaController } from '../presentation/http/controllers/PasarelaController.js';
+import { PasarelaRouter } from '../presentation/http/routers/PasarelaRouter.js';
 import { AuthController } from '../presentation/http/controllers/AuthController.js';
 import { TableroController } from '../presentation/http/controllers/TableroController.js';
 import { MiembroController } from '../presentation/http/controllers/MiembroController.js';
@@ -76,6 +79,7 @@ export function crearContenedor() {
       ? new N8nEnviadorCorreos({ url: env.N8N_CORREOS_URL, token: env.N8N_CORREOS_TOKEN })
       : new ConsolaEnviadorCorreos(),
     urlFrontend: env.URL_FRONTEND,
+    pasarela: new StripePasarela({ llaveSecreta: env.STRIPE_SECRET_KEY, secretoAvisos: env.STRIPE_WEBHOOK_SECRET }),
   };
 
   // ---------- aplicación ----------
@@ -105,6 +109,7 @@ export function crearContenedor() {
     ['/tableros/:tableroId/reportes', modulo(ReporteController, LecturaRouter, { ...privado, accion: 'obtener' })],
     ['/integraciones', modulo(IntegracionController, IntegracionRouter, { middlewares: [tokenIntegracion(env.INTEGRACION_TOKEN)] })],
     ['/tableros/:tableroId/pagos', modulo(PagoController, PagoRouter)],
+    ['/pasarela', modulo(PasarelaController, PasarelaRouter, { middlewares: [] })],
     ['/tableros/:tableroId/balance', modulo(BalanceController, LecturaRouter, { ...privado, accion: 'obtener' })],
     ['/tableros/:tableroId/actividad', modulo(ActividadController, LecturaRouter, { ...privado, accion: 'listar' })],
     ['/tableros', modulo(TableroController, TableroRouter)],

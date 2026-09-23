@@ -28,6 +28,11 @@ export class PgPagoRepository extends PagoRepository {
     return aEntidad(await this.modelo.actualizar(pago.id, pago));
   }
 
+  /** El pago que ya se registró para esa sesión de Checkout (para no registrarlo dos veces). */
+  async porSesionStripe(sesionId) {
+    return aEntidad(await this.modelo.buscarUno({ stripeSesionId: sesionId }));
+  }
+
   async borrar(id) {
     await this.modelo.borrar(id);
   }

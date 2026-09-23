@@ -8,7 +8,7 @@ const LADA_MEXICO = '52';
 const regla = (codigo, mensaje) => new ReglaDeNegocioError(codigo, mensaje);
 
 export class Usuario extends BaseEntity {
-  static privados = ['passwordHash'];
+  static privados = ['passwordHash', 'stripeCuentaId'];
 
   /** @param {{ nombre: string, email: string, passwordHash: string, color?: string }} datos */
   static registrar({ nombre, email, passwordHash, color }) {
@@ -72,6 +72,15 @@ export class Usuario extends BaseEntity {
     // Sin banco escrito, se deduce de la CLABE
     if (!this.banco && this.clabe) this.banco = bancoDeClabe(this.clabe) ?? null;
     if (titularCuenta !== undefined) this.titularCuenta = titularCuenta?.trim() || null;
+  }
+
+  /** Su cuenta de cobro con tarjeta (Stripe); marcarCobros(true) cuando ya terminó el alta y puede recibir. */
+  vincularCobros(cuentaId) {
+    this.stripeCuentaId = cuentaId;
+  }
+
+  marcarCobros(listo) {
+    this.stripeListo = Boolean(listo);
   }
 
   cambiarPassword(passwordHash) {

@@ -53,6 +53,11 @@ import { ArchivarNota } from '../../application/use-cases/notas/ArchivarNota.js'
 import { ArchivarSaldadas } from '../../application/use-cases/notas/ArchivarSaldadas.js';
 import { ObtenerReporte } from '../../application/use-cases/reportes/ObtenerReporte.js';
 import { RecordatoriosDelDia } from '../../application/use-cases/integraciones/RecordatoriosDelDia.js';
+import { ConectarCobros } from '../../application/use-cases/cobros/ConectarCobros.js';
+import { EstadoCobros } from '../../application/use-cases/cobros/EstadoCobros.js';
+import { PagarConTarjeta } from '../../application/use-cases/cobros/PagarConTarjeta.js';
+import { VerificarPagoConTarjeta } from '../../application/use-cases/cobros/VerificarPagoConTarjeta.js';
+import { AvisoPasarela } from '../../application/use-cases/cobros/AvisoPasarela.js';
 import { LiquidarMisDeudas } from '../../application/use-cases/pagos/LiquidarMisDeudas.js';
 import { ImportarMovimientos } from '../../application/use-cases/notas/ImportarMovimientos.js';
 import { ListarIngresos } from '../../application/use-cases/ingresos/ListarIngresos.js';
@@ -121,6 +126,11 @@ const CASOS = {
   obtenerReporte: ObtenerReporte,
   recordatoriosDelDia: RecordatoriosDelDia,
   liquidarMisDeudas: LiquidarMisDeudas,
+  conectarCobros: ConectarCobros,
+  estadoCobros: EstadoCobros,
+  pagarConTarjeta: PagarConTarjeta,
+  verificarPagoConTarjeta: VerificarPagoConTarjeta,
+  avisoPasarela: AvisoPasarela,
   importarMovimientos: ImportarMovimientos,
   listarIngresos: ListarIngresos,
   crearIngreso: CrearIngreso,

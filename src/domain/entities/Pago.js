@@ -43,6 +43,18 @@ export class Pago extends BaseEntity {
     });
   }
 
+  /**
+   * Pago con tarjeta que la pasarela ya cobró: nace confirmado (el dinero ya llegó
+   * a la cuenta de quien cobra), con las mismas reglas de miembros y nota.
+   */
+  static conTarjeta(datos, { tableroId, miembrosIds, nota = null, sesionId, ahora = new Date() }) {
+    const pago = Pago.registrar({ ...datos, metodo: 'tarjeta' }, { tableroId, autorId: datos.deUsuarioId, miembrosIds, nota, ahora });
+    pago.estado = 'confirmado';
+    pago.confirmadoEn = ahora;
+    pago.stripeSesionId = sesionId;
+    return pago;
+  }
+
   static #validarNota(nota, { tableroId, a }) {
     if (!nota || nota.tableroId !== tableroId) throw new ReglaDeNegocioError('NOTA_INVALIDA', 'Esa nota no es de este tablero');
     if (!nota.afectaBalance()) throw new ReglaDeNegocioError('NOTA_SIN_DEUDA', 'Esa nota no genera deuda entre miembros');
