@@ -34,7 +34,8 @@ const esquema = z.object({
 
 const resultado = esquema
   .refine((e) => !e.N8N_CORREOS_URL || e.N8N_CORREOS_TOKEN, { message: 'Falta N8N_CORREOS_TOKEN', path: ['N8N_CORREOS_TOKEN'] })
-  .safeParse(process.env);
+  // Una variable vacía (`N8N_CORREOS_URL=`) cuenta como no configurada, no como inválida
+  .safeParse(Object.fromEntries(Object.entries(process.env).filter(([, valor]) => valor !== '')));
 if (!resultado.success) {
   console.error('Variables de entorno inválidas:', resultado.error.flatten().fieldErrors);
   process.exit(1);
