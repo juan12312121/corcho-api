@@ -13,6 +13,7 @@ export class NotaController extends BaseController {
   abonar = this.accion('abonarNota', { body: esquemas.abonar });
   archivar = this.accion('archivarNota', { body: esquemas.archivar });
   archivarSaldadas = this.accion('archivarSaldadas');
+  importar = this.accion('importarMovimientos', { body: esquemas.importar, status: 201 });
   // Fotos de tickets (Cloudinary)
   firmarFoto = this.accion('firmarSubida');
   agregarFoto = this.accion('registrarAdjunto', { body: esquemas.adjunto, status: 201 });

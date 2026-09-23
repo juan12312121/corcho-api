@@ -28,6 +28,10 @@ import { ReporteController } from '../presentation/http/controllers/ReporteContr
 import { IntegracionController } from '../presentation/http/controllers/IntegracionController.js';
 import { PresupuestoRouter } from '../presentation/http/routers/PresupuestoRouter.js';
 import { IntegracionRouter } from '../presentation/http/routers/IntegracionRouter.js';
+import { IngresoController } from '../presentation/http/controllers/IngresoController.js';
+import { IngresoRouter } from '../presentation/http/routers/IngresoRouter.js';
+import { MetaController } from '../presentation/http/controllers/MetaController.js';
+import { MetaRouter } from '../presentation/http/routers/MetaRouter.js';
 import { AuthController } from '../presentation/http/controllers/AuthController.js';
 import { TableroController } from '../presentation/http/controllers/TableroController.js';
 import { MiembroController } from '../presentation/http/controllers/MiembroController.js';
@@ -96,6 +100,8 @@ export function crearContenedor() {
     ['/tableros/:tableroId/notas', modulo(NotaController, NotaRouter)],
     ['/tableros/:tableroId/categorias', modulo(CategoriaController, CategoriaRouter)],
     ['/tableros/:tableroId/presupuestos', modulo(PresupuestoController, PresupuestoRouter)],
+    ['/tableros/:tableroId/ingresos', modulo(IngresoController, IngresoRouter)],
+    ['/tableros/:tableroId/metas', modulo(MetaController, MetaRouter)],
     ['/tableros/:tableroId/reportes', modulo(ReporteController, LecturaRouter, { ...privado, accion: 'obtener' })],
     ['/integraciones', modulo(IntegracionController, IntegracionRouter, { middlewares: [tokenIntegracion(env.INTEGRACION_TOKEN)] })],
     ['/tableros/:tableroId/pagos', modulo(PagoController, PagoRouter)],

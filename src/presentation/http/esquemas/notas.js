@@ -39,6 +39,10 @@ const contenido = {
   /** Deuda con alguien de fuera (tablero personal) */
   contraparte: z.string().trim().min(1).max(80).optional(),
   direccion: z.enum(['debo', 'me_deben']).optional(),
+  /** Pagado en otra moneda: el monto del tablero lo calcula el servidor (montoOriginal × tipoCambio). null la quita */
+  monedaOriginal: z.string().regex(/^[A-Za-z]{3}$/, 'Código de 3 letras').transform((m) => m.toUpperCase()).nullable().optional(),
+  montoOriginal: dinero.optional(),
+  tipoCambio: z.number().positive().max(1_000_000).optional(),
 };
 
 export const crear = z.object({
@@ -66,6 +70,22 @@ export const mover = z.object({
 
 export const pagar = z.object({ pagadoPor: uuid.optional(), fecha: fecha.optional() });
 export const abonar = z.object({ monto: dinero });
+
+/** Movimientos ya leídos del CSV del banco: cargos → gastos, abonos → ingresos. */
+export const importar = z.object({
+  movimientos: z
+    .array(
+      z.object({
+        tipo: z.enum(['gasto', 'ingreso']),
+        titulo: z.string().trim().min(1).max(120),
+        monto: dinero,
+        fecha,
+        categoriaId: uuid.nullable().optional(),
+      }),
+    )
+    .min(1)
+    .max(300),
+});
 
 export const archivar = z.object({ archivada: z.boolean() });
 

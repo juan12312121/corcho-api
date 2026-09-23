@@ -10,6 +10,8 @@ import { PgPresupuestoRepository } from './repositories/PgPresupuestoRepository.
 import { PgAdjuntoRepository } from './repositories/PgAdjuntoRepository.js';
 import { PgComentarioRepository } from './repositories/PgComentarioRepository.js';
 import { PgRecuperacionRepository } from './repositories/PgRecuperacionRepository.js';
+import { PgIngresoRepository } from './repositories/PgIngresoRepository.js';
+import { PgMetaRepository } from './repositories/PgMetaRepository.js';
 
 /**
  * Fábrica de repositorios: con el pool da los de uso normal y con un cliente
@@ -31,6 +33,8 @@ export class RepositoryFactory {
       adjuntos: new PgAdjuntoRepository(db),
       comentarios: new PgComentarioRepository(db),
       recuperaciones: new PgRecuperacionRepository(db),
+      ingresos: new PgIngresoRepository(db),
+      metas: new PgMetaRepository(db),
     };
   }
 }

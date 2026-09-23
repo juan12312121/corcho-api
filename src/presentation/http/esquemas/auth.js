@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { colorHex } from './comunes.js';
+import { colorHex, dinero } from './comunes.js';
 
 export const registro = z.object({
   nombre: z.string().trim().min(1).max(80),
@@ -25,6 +25,8 @@ export const perfil = z
     clabe: z.string().trim().max(24).nullable().optional(),
     banco: z.string().trim().max(60).nullable().optional(),
     titularCuenta: z.string().trim().max(80).nullable().optional(),
+    /** Privado: los demás miembros solo ven tu porcentaje para repartir */
+    ingresoMensual: dinero.nullable().optional(),
     password: z.string().min(8).max(72).optional(),
     passwordActual: z.string().optional(),
   })

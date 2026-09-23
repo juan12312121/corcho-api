@@ -47,6 +47,23 @@ export function entrePares(deudas) {
 }
 
 /**
+ * Lo que YO tengo que pagar para quedar a mano: las sugerencias donde pago yo,
+ * menos lo que ya mandé y sigue pendiente de confirmar (para no pagar dos veces).
+ * @param {Transferencia[]} sugerencias
+ * @param {{ aUsuarioId: string, monto: number }[]} pendientes  mis pagos pendientes
+ * @returns {Transferencia[]}
+ */
+export function misPagosParaQuedarAMano(sugerencias, yoId, pendientes = []) {
+  return sugerencias
+    .filter((s) => s.de === yoId)
+    .map((s) => {
+      const enCamino = pendientes.filter((p) => p.aUsuarioId === s.a).reduce((t, p) => t + aCentavos(p.monto), 0);
+      return { ...s, monto: aPesos(aCentavos(s.monto) - enCamino) };
+    })
+    .filter((s) => s.monto > 0);
+}
+
+/**
  * Mínimo de transferencias para dejar a todos en cero (voraz: el que más debe
  * le paga al que más le deben). A lo sumo n-1 pagos. @returns {Transferencia[]}
  */

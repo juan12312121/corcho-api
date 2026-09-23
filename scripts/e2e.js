@@ -338,6 +338,66 @@ try {
   await pedir('POST', '/auth/restablecer', { body: { token: tokenPrueba, password: 'otra-secreta-123' }, esperado: 410 });
   await pedir('POST', '/auth/login', { body: { email: caro.usuario.email, password: 'nueva-secreta-123' } });
   paso('recuperar contraseña: misma respuesta exista o no el correo; el enlace es de un solo uso');
+
+  // ---------- quedar a mano con un clic ----------
+  const balanceAntes = await pedir('GET', `${T}/balance`, { token: caro.token });
+  const deboAntes = balanceAntes.sugerencias.filter((s) => s.de === caro.usuario.id);
+  const { pagos: misPagos } = await pedir('POST', `${T}/pagos/liquidar`, { token: nueva.token, body: {} });
+  assert.equal(misPagos.length, deboAntes.length);
+  assert.ok(misPagos.every((p) => p.estado === 'pendiente' && p.deUsuarioId === caro.usuario.id));
+  const otraVez = await pedir('POST', `${T}/pagos/liquidar`, { token: nueva.token, body: {} });
+  assert.equal(otraVez.pagos.length, 0, 'lo pendiente no se vuelve a pagar');
+  paso(`quedar a mano con un clic: ${misPagos.length} pago(s) pendientes de confirmar; repetir no duplica`);
+
+  // ---------- reparto por ingresos (solo se ve el porcentaje) ----------
+  await pedir('PATCH', '/auth/yo', { token: ana.token, body: { ingresoMensual: 30000 } });
+  await pedir('PATCH', '/auth/yo', { token: beto.token, body: { ingresoMensual: 10000 } });
+  const conPesos = (await pedir('GET', T, { token: beto.token })).miembros;
+  assert.equal(conPesos.find((m) => m.usuarioId === ana.usuario.id).pesoIngreso, 75);
+  assert.ok(conPesos.every((m) => m.ingresoMensual === undefined), 'el monto del ingreso nunca sale');
+  paso('ingresos por persona: los demás ven solo el porcentaje (Ana 75 %)');
+
+  // Ana convirtió su personal en compartido más arriba: estos pasos van en el personal de Beto
+  const personalBeto = (await pedir('GET', '/tableros', { token: beto.token })).find((t) => t.tipo === 'personal');
+  const PB = `/tableros/${personalBeto.id}`;
+  const superBeto = (await pedir('GET', `${PB}/categorias`, { token: beto.token })).find((c) => c.nombre === 'Súper');
+
+  // ---------- otra moneda ----------
+  const cena = await pedir('POST', `${PB}/notas`, { token: beto.token, body: { titulo: 'Cena en NY', monedaOriginal: 'usd', montoOriginal: 50, tipoCambio: 18.2 } });
+  assert.deepEqual([cena.monto, cena.monedaOriginal, cena.montoOriginal], [910, 'USD', 50]);
+  paso('otra moneda: US$50 × 18.20 = $910.00 en el tablero');
+
+  // ---------- flujo del mes (ingresos) ----------
+  await pedir('POST', `${PB}/ingresos`, { token: beto.token, body: { concepto: 'Sueldo', monto: 20000, recurrente: true } });
+  await pedir('POST', `${T}/ingresos`, { token: beto.token, body: { concepto: 'x', monto: 1 }, esperado: 422 });
+  const flujo = await pedir('GET', `${PB}/balance`, { token: beto.token });
+  assert.equal(flujo.ingresosMes, 20000);
+  assert.equal(flujo.disponible, 20000 - flujo.gastadoMes);
+  paso(`flujo del mes: entró ${flujo.ingresosMes}, salió ${flujo.gastadoMes}, quedan ${flujo.disponible}`);
+
+  // ---------- metas de ahorro ----------
+  const meta = await pedir('POST', `${T}/metas`, { token: ana.token, body: { nombre: 'Vacaciones', objetivo: 15000 } });
+  await pedir('POST', `${T}/metas/${meta.id}/aportes`, { token: beto.token, body: { monto: 2000 } });
+  const conRetiro = await pedir('POST', `${T}/metas/${meta.id}/aportes`, { token: ana.token, body: { monto: -500 } });
+  assert.equal(conRetiro.ahorrado, 1500);
+  await pedir('POST', `${T}/metas/${meta.id}/aportes`, { token: ana.token, body: { monto: -5000 }, esperado: 422 });
+  await pedir('DELETE', `${T}/metas/${meta.id}`, { token: caro.token, esperado: 403 });
+  paso('metas: aportes de varios, retiros sin quedar en negativo; solo autor o admin la borra');
+
+  // ---------- importar estado de cuenta ----------
+  const importado = await pedir('POST', `${PB}/notas/importar`, {
+    token: beto.token,
+    body: {
+      movimientos: [
+        { tipo: 'gasto', titulo: 'OXXO', monto: 85.5, fecha: '2026-09-01', categoriaId: superBeto.id },
+        { tipo: 'gasto', titulo: 'Gasolina', monto: 900, fecha: '2026-09-03' },
+        { tipo: 'ingreso', titulo: 'Transferencia recibida', monto: 1200, fecha: '2026-09-05' },
+      ],
+    },
+  });
+  assert.deepEqual([importado.gastos, importado.ingresos, importado.archivadas], [2, 1, true]);
+  await pedir('POST', `${PB}/notas/importar`, { token: beto.token, body: { movimientos: [{ tipo: 'gasto', titulo: 'x', monto: 1, fecha: '2026-09-01', categoriaId: mascotas.id }] }, esperado: [404, 422] });
+  paso('importar CSV: 2 cargos (al archivo) + 1 abono (ingreso) en una transacción');
 } finally {
   for (const s of sockets) s.close();
   await pool.query(

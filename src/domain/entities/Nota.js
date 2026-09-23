@@ -5,12 +5,14 @@ import { hoy as hoyDe } from '../shared/Fechas.js';
 import { repartir } from '../services/Reparto.js';
 import { siguienteFecha } from '../services/Recurrencia.js';
 import { mensualidad, validarPlazo } from '../services/PlanMeses.js';
+import { conMonedaExtranjera } from '../services/Moneda.js';
 
 export const TIPOS_NOTA = ['gasto', 'servicio', 'prestamo', 'recordatorio'];
 export const COLORES_NOTA = ['amarillo', 'azul', 'verde', 'rosa', 'naranja', 'morado'];
 export const DIRECCIONES = ['debo', 'me_deben'];
 
 const CAMPOS_LIBRES = ['descripcion', 'categoriaId', 'fecha', 'venceEn', 'recurrencia', 'color', 'pinColor', 'posX', 'posY', 'rotacion', 'z'];
+const CAMPOS_MONEDA = ['monedaOriginal', 'montoOriginal', 'tipoCambio'];
 const CAMPOS_DINERO = ['monto', 'modoReparto', 'participantes', 'pagadoPor'];
 const CAMPOS_EXTERNA = ['monto', 'contraparte', 'direccion'];
 
@@ -35,8 +37,10 @@ export class Nota extends BaseEntity {
    * @param {object} datos  lo que pidió el usuario
    * @param {{ tablero: import('./Tablero.js').Tablero, autorId: string, miembrosIds: string[], z: number, ahora?: Date }} contexto
    */
-  static crear(datos, { tablero, autorId, miembrosIds, z, ahora = new Date() }) {
-    const tipo = datos.tipo ?? 'gasto';
+  static crear(datosPedidos, { tablero, autorId, miembrosIds, z, ahora = new Date() }) {
+    const tipo = datosPedidos.tipo ?? 'gasto';
+    if (tipo === 'recordatorio' && datosPedidos.monedaOriginal) throw regla('RECORDATORIO_SIN_DINERO', 'Un recordatorio no lleva dinero');
+    const datos = conMonedaExtranjera(datosPedidos, tablero.moneda);
     if (!TIPOS_NOTA.includes(tipo)) throw regla('TIPO_INVALIDO', `Tipo de nota desconocido: ${tipo}`);
 
     const nota = new Nota({
@@ -63,6 +67,9 @@ export class Nota extends BaseEntity {
       planId: null,
       montoPlan: null,
       archivada: false,
+      monedaOriginal: datos.monedaOriginal ?? null,
+      montoOriginal: datos.montoOriginal ?? null,
+      tipoCambio: datos.tipoCambio ?? null,
       color: datos.color ?? 'amarillo',
       pinColor: datos.pinColor ?? 'rojo',
       posX: datos.posX ?? 40,
@@ -141,7 +148,10 @@ export class Nota extends BaseEntity {
    * Cambia contenido y/o dinero. Devuelve si cambió el dinero (para recalcular liquidaciones).
    * @returns {{ tocaDinero: boolean }}
    */
-  editar(cambios, { tablero, miembrosIds }) {
+  editar(cambiosPedidos, { tablero, miembrosIds }) {
+    // Cambiar el monto a mano quita la conversión: ya no correspondería al monto original
+    const sinConversion = cambiosPedidos.monto !== undefined && cambiosPedidos.monedaOriginal === undefined && this.monedaOriginal;
+    const cambios = conMonedaExtranjera(sinConversion ? { ...cambiosPedidos, monedaOriginal: null } : cambiosPedidos, tablero.moneda);
     const pide = (campos) => campos.filter((c) => cambios[c] !== undefined);
     const dinero = pide(CAMPOS_DINERO);
     const externa = pide(['contraparte', 'direccion']);
@@ -149,6 +159,7 @@ export class Nota extends BaseEntity {
     if (this.esRecordatorio() && (dinero.length || externa.length)) throw regla('RECORDATORIO_SIN_DINERO', 'Un recordatorio no lleva dinero');
     if (cambios.titulo !== undefined) this.titulo = Nota.#tituloValido(cambios.titulo);
     for (const c of pide(CAMPOS_LIBRES)) this[c] = cambios[c];
+    for (const c of pide(CAMPOS_MONEDA)) this[c] = cambios[c];
     if (cambios.plazoMeses !== undefined) this.#cambiarPlazo(cambios.plazoMeses);
     if (this.esCuotaDePlan() && cambios.monto !== undefined)
       throw regla('MENSUALIDAD_FIJA', 'El monto de una mensualidad sale del total de la compra; no se edita');

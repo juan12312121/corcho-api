@@ -18,7 +18,9 @@ export class PgMiembroRepository extends MiembroRepository {
     return this.modelo.filas(
       `SELECT m.usuario_id AS "usuarioId", m.rol, m.apodo, m.unido_en AS "unidoEn",
               u.nombre, u.email, u.color, u.avatar_url AS "avatarUrl",
-              u.clabe, u.banco, u.titular_cuenta AS "titularCuenta"
+              u.clabe, u.banco, u.titular_cuenta AS "titularCuenta",
+              -- Solo el porcentaje del total de ingresos del tablero: el monto es privado
+              round(100 * u.ingreso_mensual / nullif(sum(u.ingreso_mensual) OVER (), 0), 2)::float AS "pesoIngreso"
          FROM tablero_miembros m JOIN usuarios u ON u.id = m.usuario_id
         WHERE m.tablero_id = $1
         ORDER BY m.unido_en`,

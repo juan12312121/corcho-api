@@ -10,8 +10,9 @@ const SIN_CATEGORIA = '-';
  *
  * @param {import('../entities/Nota.js').Nota[]} notas
  * @param {Date} [ahora]
+ * @param {import('../entities/Ingreso.js').Ingreso[]} [ingresos]  lo que entra (sueldo, ventas…)
  */
-export function resumenPersonal(notas, ahora = new Date()) {
+export function resumenPersonal(notas, ahora = new Date(), ingresos = []) {
   const hoy = hoyDe(ahora);
   const mes = mesDe(hoy);
   const conDinero = notas.filter((n) => !n.esRecordatorio() && !n.esDeudaExterna());
@@ -31,10 +32,15 @@ export function resumenPersonal(notas, ahora = new Date()) {
   const pendiente = (direccion) => sumar(...externas.filter((n) => n.direccion === direccion).map((n) => n.restante()));
 
   const total = (lista) => ({ total: sumar(...lista.map((n) => n.monto)), cantidad: lista.length });
+  const gastadoMes = sumar(...delMes.map((n) => n.monto));
+  const ingresosMes = sumar(...ingresos.filter((i) => i.cuentaEnMes(mes)).map((i) => i.monto));
   return {
     tipo: 'personal',
     mes,
-    gastadoMes: sumar(...delMes.map((n) => n.monto)),
+    gastadoMes,
+    // Flujo del mes: entró − salió
+    ingresosMes,
+    disponible: sumar(ingresosMes, -gastadoMes),
     porCategoria: [...categorias].map(([categoriaId, total]) => ({ categoriaId: categoriaId === SIN_CATEGORIA ? null : categoriaId, total })).sort((a, b) => b.total - a.total),
     porPagar: total(porPagar),
     vencidas: total(vencidas),

@@ -23,6 +23,7 @@ export class Usuario extends BaseEntity {
       clabe: null,
       banco: null,
       titularCuenta: null,
+      ingresoMensual: null,
     });
   }
 
@@ -30,6 +31,14 @@ export class Usuario extends BaseEntity {
     const limpio = String(nombre ?? '').trim();
     if (!limpio || limpio.length > 80) throw regla('NOMBRE_INVALIDO', 'El nombre debe tener de 1 a 80 caracteres');
     return limpio;
+  }
+
+  /** Ingreso al mes (privado): solo sirve para repartir en proporción. null lo borra. */
+  static #ingresoValido(ingreso) {
+    if (ingreso === null) return null;
+    const n = Number(ingreso);
+    if (!(n > 0) || Math.round(n * 100) / 100 !== n) throw regla('INGRESO_INVALIDO', 'El ingreso es un monto mayor a cero con máximo 2 decimales');
+    return n;
   }
 
   /** 10 dígitos → se le antepone la lada de México (52). Acepta espacios, guiones y "+". */
@@ -41,7 +50,8 @@ export class Usuario extends BaseEntity {
     return completo;
   }
 
-  actualizarPerfil({ nombre, color, avatarUrl, telefono, avisosWhatsapp }) {
+  actualizarPerfil({ nombre, color, avatarUrl, telefono, avisosWhatsapp, ingresoMensual }) {
+    if (ingresoMensual !== undefined) this.ingresoMensual = Usuario.#ingresoValido(ingresoMensual);
     if (nombre !== undefined) this.nombre = Usuario.#nombreValido(nombre);
     if (color !== undefined) this.color = color;
     if (avatarUrl !== undefined) this.avatarUrl = avatarUrl;

@@ -14,8 +14,9 @@ const SIN_CATEGORIA = { nombre: 'Sin categoría', icono: 'label_off', color: '#7
  *  - ambos:      lo que va "a meses" (compras y deudas) y el avance de los presupuestos del mes.
  */
 export class ObtenerBalance extends UseCase {
-  constructor({ acceso, miembros, notas, categorias, presupuestos, consultasBalance }) {
+  constructor({ acceso, miembros, notas, categorias, presupuestos, ingresos, consultasBalance }) {
     super();
+    this.ingresos = ingresos;
     this.presupuestos = presupuestos;
     this.acceso = acceso;
     this.miembros = miembros;
@@ -34,7 +35,7 @@ export class ObtenerBalance extends UseCase {
   }
 
   async #personal(tableroId, notas) {
-    const resumen = resumenPersonal(notas);
+    const resumen = resumenPersonal(notas, new Date(), await this.ingresos.listar(tableroId));
     const categorias = new Map((await this.categorias.listar(tableroId)).map((c) => [c.id, c]));
     return {
       ...resumen,

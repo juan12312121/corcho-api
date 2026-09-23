@@ -33,10 +33,17 @@ export function reporteDeGastos(notas, { meses = 6, ahora = new Date() } = {}) {
 
   const categorias = new Map();
   const personas = new Map();
+  const persona = (u) => personas.get(u) ?? personas.set(u, { usuarioId: u, total: 0, pagado: 0, veces: 0 }).get(u);
   for (const n of enPeriodo) {
     const c = n.categoriaId ?? 'sin';
     categorias.set(c, sumar(categorias.get(c), n.monto));
-    for (const p of n.partes) personas.set(p.usuarioId, sumar(personas.get(p.usuarioId), p.monto));
+    // total = lo que le tocó; pagado = lo que adelantó de su bolsa; veces = cuántas veces pagó primero
+    for (const p of n.partes) persona(p.usuarioId).total = sumar(persona(p.usuarioId).total, p.monto);
+    if (n.pagadoPor) {
+      const quien = persona(n.pagadoPor);
+      quien.pagado = sumar(quien.pagado, n.monto);
+      quien.veces++;
+    }
   }
 
   const total = sumar(...enPeriodo.map((n) => n.monto));
@@ -46,7 +53,7 @@ export function reporteDeGastos(notas, { meses = 6, ahora = new Date() } = {}) {
     promedioMensual: Math.round((total / meses) * 100) / 100,
     porMes,
     porCategoria: [...categorias].map(([categoriaId, monto]) => ({ categoriaId: categoriaId === 'sin' ? null : categoriaId, total: monto })).sort((a, b) => b.total - a.total),
-    porPersona: [...personas].map(([usuarioId, monto]) => ({ usuarioId, total: monto })).sort((a, b) => b.total - a.total),
+    porPersona: [...personas.values()].map((p) => ({ ...p, diferencia: sumar(p.pagado, -p.total) })).sort((a, b) => b.total - a.total),
     // Detalle plano para exportar a Excel
     detalle: enPeriodo
       .sort((a, b) => a.fecha.localeCompare(b.fecha))

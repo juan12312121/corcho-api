@@ -131,7 +131,11 @@ describe('Reportes', () => {
     assert.equal(r.total, 400);
     assert.deepEqual(r.porMes.map((m) => m.total), [0, 100, 300]);
     assert.deepEqual(r.porCategoria, [{ categoriaId: 'super', total: 400 }]);
-    assert.deepEqual(r.porPersona, [{ usuarioId: 'ana', total: 200 }, { usuarioId: 'beto', total: 200 }]);
+    // Ana pagó los dos súper (400) y le tocaba la mitad (200): adelantó 200 de más
+    assert.deepEqual(r.porPersona, [
+      { usuarioId: 'ana', total: 200, pagado: 400, veces: 2, diferencia: 200 },
+      { usuarioId: 'beto', total: 200, pagado: 0, veces: 0, diferencia: -200 },
+    ]);
     assert.equal(r.detalle.length, 2);
   });
 });

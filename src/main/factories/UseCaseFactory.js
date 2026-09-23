@@ -53,6 +53,15 @@ import { ArchivarNota } from '../../application/use-cases/notas/ArchivarNota.js'
 import { ArchivarSaldadas } from '../../application/use-cases/notas/ArchivarSaldadas.js';
 import { ObtenerReporte } from '../../application/use-cases/reportes/ObtenerReporte.js';
 import { RecordatoriosDelDia } from '../../application/use-cases/integraciones/RecordatoriosDelDia.js';
+import { LiquidarMisDeudas } from '../../application/use-cases/pagos/LiquidarMisDeudas.js';
+import { ImportarMovimientos } from '../../application/use-cases/notas/ImportarMovimientos.js';
+import { ListarIngresos } from '../../application/use-cases/ingresos/ListarIngresos.js';
+import { CrearIngreso } from '../../application/use-cases/ingresos/CrearIngreso.js';
+import { BorrarIngreso } from '../../application/use-cases/ingresos/BorrarIngreso.js';
+import { ListarMetas } from '../../application/use-cases/metas/ListarMetas.js';
+import { CrearMeta } from '../../application/use-cases/metas/CrearMeta.js';
+import { AportarMeta } from '../../application/use-cases/metas/AportarMeta.js';
+import { BorrarMeta } from '../../application/use-cases/metas/BorrarMeta.js';
 
 /** Nombre del caso de uso (como lo piden los controladores) → clase. */
 const CASOS = {
@@ -111,6 +120,15 @@ const CASOS = {
   archivarSaldadas: ArchivarSaldadas,
   obtenerReporte: ObtenerReporte,
   recordatoriosDelDia: RecordatoriosDelDia,
+  liquidarMisDeudas: LiquidarMisDeudas,
+  importarMovimientos: ImportarMovimientos,
+  listarIngresos: ListarIngresos,
+  crearIngreso: CrearIngreso,
+  borrarIngreso: BorrarIngreso,
+  listarMetas: ListarMetas,
+  crearMeta: CrearMeta,
+  aportarMeta: AportarMeta,
+  borrarMeta: BorrarMeta,
 };
 
 /**

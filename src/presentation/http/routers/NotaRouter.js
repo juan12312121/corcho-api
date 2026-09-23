@@ -5,6 +5,7 @@ export class NotaRouter extends BaseRouter {
   rutas() {
     this.post('/fotos/firma', 'firmarFoto');
     this.post('/archivar-saldadas', 'archivarSaldadas');
+    this.post('/importar', 'importar');
     this.patch('/:notaId/posicion', 'mover');
     this.patch('/:notaId/archivo', 'archivar');
     this.post('/:notaId/adjuntos', 'agregarFoto');

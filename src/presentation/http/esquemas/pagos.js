@@ -13,6 +13,8 @@ export const registrar = z.object({
   fecha: fecha.optional(),
 });
 
+export const liquidar = z.object({ metodo: z.enum(['efectivo', 'transferencia', 'tarjeta', 'otro']).optional() });
+
 export const filtros = z.object({
   ...paginacion,
   estado: z.enum(['pendiente', 'confirmado', 'rechazado']).optional(),
