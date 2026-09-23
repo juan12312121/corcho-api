@@ -13,7 +13,7 @@ import { JwtTokenService } from '../infrastructure/security/JwtTokenService.js';
 import { CryptoGeneradorCodigos } from '../infrastructure/security/CryptoGeneradorCodigos.js';
 import { EventBus } from '../infrastructure/events/EventBus.js';
 import { CloudinaryAlmacen } from '../infrastructure/storage/CloudinaryAlmacen.js';
-import { SmtpEnviadorCorreos } from '../infrastructure/mail/SmtpEnviadorCorreos.js';
+import { N8nEnviadorCorreos } from '../infrastructure/mail/N8nEnviadorCorreos.js';
 import { ConsolaEnviadorCorreos } from '../infrastructure/mail/ConsolaEnviadorCorreos.js';
 import { CryptoGeneradorTokens } from '../infrastructure/security/CryptoGeneradorTokens.js';
 
@@ -68,8 +68,8 @@ export function crearContenedor() {
       apiKey: env.CLOUDINARY_API_KEY,
       apiSecret: env.CLOUDINARY_API_SECRET,
     }),
-    correos: env.SMTP_HOST
-      ? new SmtpEnviadorCorreos({ host: env.SMTP_HOST, port: env.SMTP_PORT, user: env.SMTP_USER, pass: env.SMTP_PASS, remitente: env.CORREO_REMITENTE })
+    correos: env.N8N_CORREOS_URL
+      ? new N8nEnviadorCorreos({ url: env.N8N_CORREOS_URL, token: env.N8N_CORREOS_TOKEN })
       : new ConsolaEnviadorCorreos(),
     urlFrontend: env.URL_FRONTEND,
   };

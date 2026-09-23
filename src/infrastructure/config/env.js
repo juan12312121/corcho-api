@@ -24,18 +24,17 @@ const esquema = z.object({
   CLOUDINARY_API_KEY: z.string().optional(),
   CLOUDINARY_API_SECRET: z.string().optional(),
 
-  /** Correo (recuperar contraseña). Sin SMTP_HOST, el correo se imprime en la consola. */
-  SMTP_HOST: z.string().optional(),
-  SMTP_PORT: z.coerce.number().default(587),
-  SMTP_USER: z.string().optional(),
-  SMTP_PASS: z.string().optional(),
-  CORREO_REMITENTE: z.string().default('Corcho <no-responder@corcho.app>'),
+  /** Correo (recuperar contraseña) por un webhook de n8n. Sin URL, el correo se imprime en la consola. */
+  N8N_CORREOS_URL: z.string().url().optional(),
+  N8N_CORREOS_TOKEN: z.string().min(24).optional(),
 
   /** Token que manda n8n en X-Integracion-Token para pedir los recordatorios. Sin él, la ruta está apagada. */
   INTEGRACION_TOKEN: z.string().min(24).optional(),
 });
 
-const resultado = esquema.safeParse(process.env);
+const resultado = esquema
+  .refine((e) => !e.N8N_CORREOS_URL || e.N8N_CORREOS_TOKEN, { message: 'Falta N8N_CORREOS_TOKEN', path: ['N8N_CORREOS_TOKEN'] })
+  .safeParse(process.env);
 if (!resultado.success) {
   console.error('Variables de entorno inválidas:', resultado.error.flatten().fieldErrors);
   process.exit(1);

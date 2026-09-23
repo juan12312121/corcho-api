@@ -132,7 +132,7 @@ s.emit('nota:arrastrando', { tableroId, notaId, posX, posY });   // mientras arr
 ## Despliegue (Render)
 
 1. En Render: **New → Blueprint** y elige este repo (usa `render.yaml`).
-2. Llena las variables que pide: `DB_USER`, `DB_PASSWORD` (Supabase → Connect → Session pooler), `CORS_ORIGEN` y `URL_FRONTEND` (la URL de Vercel), y las de Cloudinary.
+2. Llena las variables que pide: `DB_USER`, `DB_PASSWORD` (Supabase → Connect → Session pooler), `CORS_ORIGEN` y `URL_FRONTEND` (la URL de Vercel), las de Cloudinary y `N8N_CORREOS_URL` + `N8N_CORREOS_TOKEN` (el flujo de n8n que manda los correos).
 3. `JWT_SECRET` e `INTEGRACION_TOKEN` se generan solos. Las migraciones se corren una vez con `npm run db:migrate` (ya están aplicadas en Supabase).
 
 El plan gratis se duerme tras 15 min sin uso: la primera petición tarda ~1 min en despertarlo.

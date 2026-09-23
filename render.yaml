@@ -41,9 +41,8 @@ services:
         sync: false
       - key: INTEGRACION_TOKEN
         generateValue: true
-      - key: SMTP_HOST
+      # Webhook del flujo de n8n que manda los correos, y su token (X-Correos-Token)
+      - key: N8N_CORREOS_URL
         sync: false
-      - key: SMTP_USER
-        sync: false
-      - key: SMTP_PASS
+      - key: N8N_CORREOS_TOKEN
         sync: false
