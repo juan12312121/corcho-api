@@ -1,0 +1,49 @@
+# Blueprint de Render: New → Blueprint → elige este repo.
+# Las variables con `sync: false` se piden al crear el servicio (no se guardan en el repo).
+services:
+  - type: web
+    name: corcho-api
+    runtime: node
+    plan: free
+    region: ohio # cerca del pooler de Supabase (us-east-2)
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /salud
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: DB_HOST
+        value: aws-0-us-east-2.pooler.supabase.com
+      - key: DB_PORT
+        value: 5432
+      - key: DB_NAME
+        value: postgres
+      - key: DB_SSL
+        value: 'true'
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRA
+        value: 7d
+      # URL de Vercel del frontend (sin / al final); varias separadas por comas
+      - key: CORS_ORIGEN
+        sync: false
+      - key: URL_FRONTEND
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: INTEGRACION_TOKEN
+        generateValue: true
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
